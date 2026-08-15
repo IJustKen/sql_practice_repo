@@ -5,7 +5,8 @@ with approved_trans as
     from Transactions t 
     where t.state = 'approved' 
     group by month, t.country
-),
+), -- CTE V IMP NEVER WRITE "WITH" AGAIN, just separate with commas that is enough
+    -- USE to_char(date_type, 'YYYY-MM' or 'Jan-YYYY' and stuff) to get the month-year and other combos from a date
 total_trans as
 (
     select count(t.id) as trans_count, sum(t.amount) as trans_total_amount, t.country, to_char(t.trans_date::date, 'YYYY-MM') as month 
@@ -17,3 +18,6 @@ select t.month, t.country, t.trans_count, coalesce(a.approved_count, 0) as appro
 from total_trans t 
 left join approved_trans a 
 on coalesce(t.country, 'na') = coalesce(a.country, 'na') and t.month = a.month;
+-- one edge case was when country itself has a null value, in that case simply doing t.country = a.country will fail
+-- because null = null does not give true it gives null.
+-- thus the coalesce checks when it is null in both it becomes "na", which is then compared and returns TRUE.
