@@ -1,4 +1,15 @@
--- Write your PostgreSQL query statement below
+-- single table scan method
+select
+    to_char(trans_date::date, 'YYYY-MM') as month,
+    country,
+    count(*) as trans_count,
+    count(*) filter (where state = 'approved') as approved_count,    -- aggregate() filter (where ..) is the syntax for this one
+    sum(amount) as trans_total_amount,
+    coalesce(sum(amount) filter (where state = 'approved'), 0) as approved_total_amount
+from Transactions group by month, country;
+
+
+-- 2 CTEs means 2 table scans and then 2 coalesce in every single row scan later, can get less efficient
 with approved_trans as 
 (
     select count(t.id) as approved_count, sum(t.amount) as approved_total_amount, t.country, to_char(t.trans_date::date, 'YYYY-MM') as month 
