@@ -13,6 +13,8 @@ from chosen_rows
 where num = num_next and num = num_nnext;  -- condition to get 3 consecutive
 
 
+
+
 -- sequential joining method
 select distinct t1.num as ConsecutiveNums  -- avoid dupes
 from Logs t1
